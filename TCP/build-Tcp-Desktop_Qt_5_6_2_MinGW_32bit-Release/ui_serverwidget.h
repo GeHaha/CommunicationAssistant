@@ -28,14 +28,14 @@ class Ui_ServerWidget
 public:
     QGridLayout *gridLayout;
     QLabel *labelRecieve;
-    QTextEdit *textEditRead;
     QLabel *labelSend;
-    QTextEdit *textEditWrite;
     QSpacerItem *horizontalSpacer;
     QPushButton *buttonSend;
     QSpacerItem *horizontalSpacer_3;
     QPushButton *buttonClose;
     QSpacerItem *horizontalSpacer_2;
+    QTextEdit *textEditRead;
+    QTextEdit *textEditWrite;
 
     void setupUi(QWidget *ServerWidget)
     {
@@ -51,20 +51,10 @@ public:
 
         gridLayout->addWidget(labelRecieve, 0, 0, 1, 1);
 
-        textEditRead = new QTextEdit(ServerWidget);
-        textEditRead->setObjectName(QStringLiteral("textEditRead"));
-
-        gridLayout->addWidget(textEditRead, 1, 1, 1, 3);
-
         labelSend = new QLabel(ServerWidget);
         labelSend->setObjectName(QStringLiteral("labelSend"));
 
         gridLayout->addWidget(labelSend, 2, 0, 1, 1);
-
-        textEditWrite = new QTextEdit(ServerWidget);
-        textEditWrite->setObjectName(QStringLiteral("textEditWrite"));
-
-        gridLayout->addWidget(textEditWrite, 3, 1, 1, 3);
 
         horizontalSpacer = new QSpacerItem(67, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -87,6 +77,16 @@ public:
         horizontalSpacer_2 = new QSpacerItem(67, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_2, 4, 4, 1, 1);
+
+        textEditRead = new QTextEdit(ServerWidget);
+        textEditRead->setObjectName(QStringLiteral("textEditRead"));
+
+        gridLayout->addWidget(textEditRead, 1, 0, 1, 5);
+
+        textEditWrite = new QTextEdit(ServerWidget);
+        textEditWrite->setObjectName(QStringLiteral("textEditWrite"));
+
+        gridLayout->addWidget(textEditWrite, 3, 0, 1, 5);
 
 
         retranslateUi(ServerWidget);

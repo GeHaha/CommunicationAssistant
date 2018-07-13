@@ -21,18 +21,12 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QTextEdit" name="textEditRead"/>
-   </item>
    <item row="2" column="0">
     <widget class="QLabel" name="labelSend">
      <property name="text">
       <string>发送区</string>
      </property>
     </widget>
-   </item>
-   <item row="3" column="1" colspan="3">
-    <widget class="QTextEdit" name="textEditWrite"/>
    </item>
    <item row="4" column="0">
     <spacer name="horizontalSpacer">
@@ -86,6 +80,12 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="1" column="0" colspan="5">
+    <widget class="QTextEdit" name="textEditRead"/>
+   </item>
+   <item row="3" column="0" colspan="5">
+    <widget class="QTextEdit" name="textEditWrite"/>
    </item>
   </layout>
  </widget>
