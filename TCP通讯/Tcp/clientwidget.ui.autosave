@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ClientWidget</class>
+ <widget class="QWidget" name="ClientWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>415</width>
+    <height>557</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>72</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>服务器端口：</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditPort">
+   <property name="geometry">
+    <rect>
+     <x>87</x>
+     <y>9</y>
+     <width>133</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>8888</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonConnect">
+   <property name="geometry">
+    <rect>
+     <x>321</x>
+     <y>20</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>连接服务器</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>35</y>
+     <width>60</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>服务器IP：</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEditIP">
+   <property name="geometry">
+    <rect>
+     <x>87</x>
+     <y>35</y>
+     <width>133</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>127.0.0.1</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEditRead">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>79</y>
+     <width>387</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>246</y>
+     <width>36</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>发送区</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEditWrite">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>264</y>
+     <width>387</width>
+     <height>162</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonClose">
+   <property name="geometry">
+    <rect>
+     <x>315</x>
+     <y>432</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>关闭连接</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="buttonSend">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>432</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>发送</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>61</y>
+     <width>36</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>接收区</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>480</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>清除接收</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_2">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>480</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>清除发送</string>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="progressBar">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>520</y>
+     <width>411</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="value">
+    <number>24</number>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>textEditRead</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>39</x>
+     <y>488</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>textEditWrite</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>336</x>
+     <y>489</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>262</x>
+     <y>342</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
