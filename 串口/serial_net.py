@@ -26,7 +26,7 @@ class Ui_MainWindow(QWidget):
     ser = serial.Serial()
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(700, 550)
+        MainWindow.resize(579, 369)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
@@ -159,6 +159,7 @@ class Ui_MainWindow(QWidget):
         self.textEdit.setGeometry(QtCore.QRect(10, 20, 241, 91))
         self.textEdit.setObjectName("textEdit")
         
+        """ 
         #图像区
         self.groupBox_4 = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox_4.setGeometry(QtCore.QRect(10, 330, 411, 181))
@@ -166,6 +167,7 @@ class Ui_MainWindow(QWidget):
         self.textEdit_2 = QtWidgets.QTextEdit(self.groupBox_4)
         self.textEdit_2.setGeometry(QtCore.QRect(10, 20, 391, 151))
         self.textEdit_2.setObjectName("textEdit_2")
+        """
         
         #Hex显示
         self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
@@ -184,6 +186,12 @@ class Ui_MainWindow(QWidget):
         self.pushButton_5 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_5.setGeometry(QtCore.QRect(430, 280, 61, 23))
         self.pushButton_5.setObjectName("pushButton_5")
+        
+        #离线读取数据得出图像
+        self.pushButton_9 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_9.setGeometry(QtCore.QRect(510, 280, 61, 23))
+        self.pushButton_9.setObjectName("pushButton_5")
+        
         
         #新加pushButton_6是显示按钮，弹出实时图像
         self.pushButton_6 = QtWidgets.QPushButton(self.centralwidget)
@@ -275,9 +283,13 @@ class Ui_MainWindow(QWidget):
         self.pushButton_4.clicked.connect(self.clean_data)
       
         
-         #显示图像
-        self.pushButton_6.setText(_translate("MainWindow", "PID图像"))
-        self.pushButton_6.clicked.connect(self.display_image)
+         #显示实时图像
+        self.pushButton_6.setText(_translate("MainWindow", "实时PID"))
+        self.pushButton_6.clicked.connect(self.on_line)
+        
+        #离线读取数据画图
+        self.pushButton_9.setText(_translate("MainWindow", "离线PID"))
+        self.pushButton_9.clicked.connect(self.off_line)
      
         
         #打开文件
@@ -295,7 +307,7 @@ class Ui_MainWindow(QWidget):
         self.label_12.setText(_translate("MainWindow", "串口状态"))
         self.groupBox_2.setTitle(_translate("MainWindow", "接收区"))
         self.groupBox_3.setTitle(_translate("MainWindow", "发送区"))
-        self.groupBox_4.setTitle(_translate("MainWindow", "图像区"))
+     #   self.groupBox_4.setTitle(_translate("MainWindow", "图像区"))
         self.checkBox.setText(_translate("MainWindow", "Hex显示"))
         self.checkBox_2.setText(_translate("MainWindow", "Hex发送"))
         
@@ -309,10 +321,10 @@ class Ui_MainWindow(QWidget):
         self.ser.parity = self.comboBox_2.currentText()
         self.ser.open()
         if(self.ser.isOpen()):
-            self.pushButton.setEnabled(False)
+            self.pushButton.setEnabled(False) #打开不成功
             self.label_12.setText("打开成功")
-            self.t1 = threading.Thread(target=self.receive_data)
-            self.t1.setDaemon(True)
+            self.t1 = threading.Thread(target=self.receive_data)   #线程
+            self.t1.setDaemon(True) #daemon，用一个布尔值来判断一个布尔值，指示该线程是否是守护线程（True）或not（False）,setDaemon用于守护进程的旧的getter/setter API;直接使用它作为一个属性
             self.t1.start()
         else:
             self.label_12.setText("打开失败")
@@ -344,9 +356,9 @@ class Ui_MainWindow(QWidget):
         res_data = '' 
         num = 0   #接收次数，初始为零，每接收一次增加一次
         while (self.ser.isOpen()):
-            size = self.ser.inWaiting()  #数据放在缓存区
+            size = self.ser.inWaiting()  #获取接收缓存区的字数节
             if size:
-                res_data = self.ser.read_all()
+                res_data = self.ser.read_all() #读取所以数据
                 if(self.checkBox.isChecked()):  #检查是什么形式的数据
                     self.textBrowser.append(binascii.b2a_hex(res_data).decode())
                 else:
@@ -391,12 +403,70 @@ class Ui_MainWindow(QWidget):
             else:
                 self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
             self.label_12.setText("发送成功")
-           #self.ser.flushOutput()
+           #self.ser.flushOutput()         #清空缓存区
         else:
             self.label_12.setText("发送失败")
-            
+
+    #离线绘图
+    def off_line(self):
+        plt.rcParams['font.sans-serif']=['Simhei']  #显示中文字体
+        plt.rcParams['axes.unicode_minus']=False    #显示负数
+        plt.xlim(-10,250)  
+        plt.ylim(-10,250)
+        plt.title("PID实时数据图像")
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.grid(True)
+        plt.show()
+        print('开始仿真')
+
+    #读取文件
+        path = "H:\PythonPort\串口\XY数据.txt"
+        file = open(path,'r')
+
+    #读取文件中的内容放到列表中
+        X_list=[]; Y_list=[];
+        try:
+            for line in file.readlines():
+                lineArr = line.strip().split()
+                X_list.append(int(lineArr[0]))  #
+                Y_list.append(int(lineArr[1]))    
+
+            plt.plot(X_list,Y_list,'r',label='pid')
+            plt.show() 
+        except Exception as error:
+            print(error)
+
+
+   #实时绘图     
+    def on_line(self):
+        plt.rcParams['font.sans-serif']=['Simhei']  #显示中文字体
+        plt.rcParams['axes.unicode_minus']=False    #显示负数
+        plt.ion() #开启interactive mode 成功的关键函数
+        plt.figure(dpi= 128, figsize =(80,80))  #c窗口大小和分辨率
+        # plt.xlim(0,100)随着时间的变化而变化
+        plt.xlabel("时间轴")
+        plt.ylabel("PID变化")
+        plt.ylim(-100,100)
+        plt.pause(1)  #停顿间隔1秒
         
-    def display_image(self):       
+        X_list = np.linspace(0,1000,num=5000)#在指定的时间间隔内返回均匀间隔的数字,返回的是均匀间隔的样本，在间隔开始时计算，停止,区间的端点可以选择性地排除。
+        Y_list = []
+        while True:          
+            size = self.ser.inWaiting()
+            if size != 0:
+                pid_data = self.ser.read(size)  #读取数据，从缓存区size读取数据放到pid_data中
+                time.sleep(1) #延迟1秒
+        try:
+            for line in pid_data.readlines():
+                lineArr = line.strip().split() # line.strip()剔除首尾的空格,line.strip().split(),针对一个字符串返回一个字符串列表
+                Y_list.append(int(lineArr[0]))
+                plt.plot(X_list,Y_list,'r')
+                plt.show()      
+        except Exception as error:            
+            print(error)
+        
+        """
         print("The image was start")
         res_data = ''     
         while (self.ser.isOpen()):
@@ -424,16 +494,29 @@ class Ui_MainWindow(QWidget):
         plt.ylabel("PID") 
         plt.ylim(0,100)
         print("开始绘图")
-       
-        y_list =[],  x=[]  
+    
+        X_list = np.linspace(0,1000,num=5000)#在指定的时间间隔内返回均匀间隔的数字,返回的是均匀间隔的样本，在间隔开始时计算，停止,区间的端点可以选择性地排除。
+        Y_list = []
+        while True:          
+            size = self.ser.inWaiting()
+            if size != 0:
+                pid_data = self.ser.read(size)  #读取数据，从缓存区size读取数据放到pid_data中
+                time.sleep(1) #延迟1秒
         try:
-            for line in res_data.readlines():
-                lineArr = line.strip().split()
-                y_list.append(int(lineArr[0]))
-            plt.plot(x,y_list,'r',label = 'pid')
-            plt.show()
+            for line in pid_data.readlines():
+                lineArr = line.strip().split() # line.strip()剔除首尾的空格,line.strip().split(),针对一个字符串返回一个字符串列表
+                Y_list.append(int(lineArr[0]))
+                plt.plot(X_list,Y_list,'r')
+                plt.show()      
         except Exception as error:            
             print(error)
+        """
+        
+        
+   
+        
+        
+
                         
 #调用程序    
 if __name__ == '__main__':
@@ -450,4 +533,4 @@ if __name__ == '__main__':
 
     
 
-    
+                                                                                                                                        
