@@ -18,10 +18,15 @@ ServerWidget::ServerWidget(QWidget *parent) :
     tcpServer->listen(QHostAddress::Any ,8888);
 
     setWindowTitle("服务器：8888");
-    //两个文件
+
+    //两个按钮都不可以按
     ui->buttonfile->setEnabled(false);
     ui->buttonSendFile->setEnabled(true);
 
+
+
+    //如果客户端成功和服务器连接
+    //tcpserver会自动触发 newConnection()
     connect(tcpServer, &QTcpServer::newConnection,
             [=]()
     {
@@ -33,9 +38,35 @@ ServerWidget::ServerWidget(QWidget *parent) :
         QString temp = QString("[%1:%2]:客户端成功连接").arg(ip).arg(port);
         ui->textEditRead->setText(temp);//显示到编辑区
 
-        //成功连接后，才能按选择文件
+        //成功连接服务器后，才能按选择文件
         ui->buttonfile->setEnabled(true);
-        }
+
+        connect(tcpSocket,&QTcpSocket::readyRead,
+                [=]()
+         {
+            //获取客户端的信息
+            QByteArray buf = tcpSocket->readAll();
+            if(QString(buf) == "file done")
+            {
+                //文件接收完毕
+                ui->textEditWrite->append("文件发送完毕");
+                file.close();
+
+                //断开客户端端口
+                tcpSocket->disconnectFromHost();
+                tcpSocket->close();
+
+              }
+
+              else
+
+           {
+                qDebug() << buf;
+          }
+
+            }
+            );
+    }
     );
 
     connect(&timer, &QTimer::timeout,
@@ -148,6 +179,7 @@ void ServerWidget::on_buttonfile_clicked()
         }
 
     }
+
 //发送文件按钮
 void ServerWidget::on_buttonSendFile_clicked()
 {
@@ -171,10 +203,10 @@ void ServerWidget::on_buttonSendFile_clicked()
        file.close();
        ui->buttonfile->setEnabled(true);
        ui->buttonSendFile->setEnabled(false);
-
    }
 
 }
+
 void ServerWidget::sendData()
 {
     qint64 len = 0;
@@ -202,4 +234,5 @@ void ServerWidget::sendData()
 
     }
 
-}
+ }
+

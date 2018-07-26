@@ -324,6 +324,7 @@ class Ui_MainWindow(QWidget):
             self.pushButton.setEnabled(False) #打开不成功
             self.label_12.setText("打开成功")
             self.t1 = threading.Thread(target=self.receive_data)   #线程
+            #isdaemon()判断
             self.t1.setDaemon(True) #daemon，用一个布尔值来判断一个布尔值，指示该线程是否是守护线程（True）或not（False）,setDaemon用于守护进程的旧的getter/setter API;直接使用它作为一个属性
             self.t1.start()
         else:
@@ -366,7 +367,7 @@ class Ui_MainWindow(QWidget):
                    
                 #指读到textbrowser末尾
                 self.textBrowser.moveCursor(QtGui.QTextCursor.End) #The QTextCursor class offers an API to access and modify QTextDocuments
-                self.ser.flushInput()               
+                self.ser.flushInput()        #清空缓存区       
                 num +=1
                 self.label_12.setText("接收："+str(num))
     
@@ -442,21 +443,28 @@ class Ui_MainWindow(QWidget):
     def on_line(self):
         plt.rcParams['font.sans-serif']=['Simhei']  #显示中文字体
         plt.rcParams['axes.unicode_minus']=False    #显示负数
-        plt.ion() #开启interactive mode 成功的关键函数
-        plt.figure(dpi= 128, figsize =(80,80))  #c窗口大小和分辨率
-        # plt.xlim(0,100)随着时间的变化而变化
+        plt.ion()   #开启interactive mode 成功的关键函数
         plt.xlabel("时间轴")
         plt.ylabel("PID变化")
-        plt.ylim(-100,100)
-        plt.pause(1)  #停顿间隔1秒
+        plt.grid(True) #添加网格
+         
+        plt.ylim(-300,300)
+        plt.pause(1)  #停顿间隔1秒 
         
-        X_list = np.linspace(0,1000,num=5000)#在指定的时间间隔内返回均匀间隔的数字,返回的是均匀间隔的样本，在间隔开始时计算，停止,区间的端点可以选择性地排除。
+        X_list= []
+        x = np.linspace(0,1000,num=5000)#在指定的时间间隔内返回均匀间隔的数字,返回的是均匀间隔的样本，在间隔开始时计算，停止,区间的端点可以选择性地排除。
+        for x1 in x:
+            X_list.append(x1)
+            
         Y_list = []
-        while True:          
-            size = self.ser.inWaiting()
-            if size != 0:
+                 
+        while True:
+            Y_list =[]
+            size = self.ser.inWaiting()         
+            if size != 0:    
                 pid_data = self.ser.read(size)  #读取数据，从缓存区size读取数据放到pid_data中
-                time.sleep(1) #延迟1秒
+                #print(3)
+                # time.sleep(1) #延迟1秒                  
         try:
             for line in pid_data.readlines():
                 lineArr = line.strip().split() # line.strip()剔除首尾的空格,line.strip().split(),针对一个字符串返回一个字符串列表
@@ -465,59 +473,9 @@ class Ui_MainWindow(QWidget):
                 plt.show()      
         except Exception as error:            
             print(error)
+       
         
-        """
-        print("The image was start")
-        res_data = ''     
-        while (self.ser.isOpen()):
-            size = self.ser.inWaiting()
-            if size:
-                res_data = self.ser.read_all()
-                if(self.checkBox.isChecked()):
-                    self.textBrowser.append(binascii.b2a_hex(res_data).decode())
-                else:
-                    self.textBrowser.append(res_data.decode())
-                    
-                #指读到textbrowser末尾
-                self.textBrowser.moveCursor(QtGui.QTextCursor.End) #The QTextCursor class offers an API to access and modify QTextDocuments
-                self.ser.flushInput()               
-                          
-        #画图
-        plt.rcParams['font.sans-serif']=['Simhei']  #显示中文字体
-        plt.rcParams['axes.unicode_minus']=False    #显示负数
-        
-        #set up matplotlib
-        
-        plt.ion() #开启interactive mode 成功的关键函数
-        # plt.xlim(0,100)随着时间的变化而变化
-        plt.xlabel("时间轴")
-        plt.ylabel("PID") 
-        plt.ylim(0,100)
-        print("开始绘图")
     
-        X_list = np.linspace(0,1000,num=5000)#在指定的时间间隔内返回均匀间隔的数字,返回的是均匀间隔的样本，在间隔开始时计算，停止,区间的端点可以选择性地排除。
-        Y_list = []
-        while True:          
-            size = self.ser.inWaiting()
-            if size != 0:
-                pid_data = self.ser.read(size)  #读取数据，从缓存区size读取数据放到pid_data中
-                time.sleep(1) #延迟1秒
-        try:
-            for line in pid_data.readlines():
-                lineArr = line.strip().split() # line.strip()剔除首尾的空格,line.strip().split(),针对一个字符串返回一个字符串列表
-                Y_list.append(int(lineArr[0]))
-                plt.plot(X_list,Y_list,'r')
-                plt.show()      
-        except Exception as error:            
-            print(error)
-        """
-        
-        
-   
-        
-        
-
-                        
 #调用程序    
 if __name__ == '__main__':
     
