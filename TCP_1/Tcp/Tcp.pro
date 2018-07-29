@@ -25,3 +25,5 @@ FORMS    += serverwidget.ui \
     clientwidget.ui
 
 CONFIG +=C++11
+
+

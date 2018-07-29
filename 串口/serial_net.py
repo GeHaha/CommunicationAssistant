@@ -159,15 +159,6 @@ class Ui_MainWindow(QWidget):
         self.textEdit.setGeometry(QtCore.QRect(10, 20, 241, 91))
         self.textEdit.setObjectName("textEdit")
         
-        """ 
-        #图像区
-        self.groupBox_4 = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox_4.setGeometry(QtCore.QRect(10, 330, 411, 181))
-        self.groupBox_4.setObjectName("groupBox_4")
-        self.textEdit_2 = QtWidgets.QTextEdit(self.groupBox_4)
-        self.textEdit_2.setGeometry(QtCore.QRect(10, 20, 391, 151))
-        self.textEdit_2.setObjectName("textEdit_2")
-        """
         
         #Hex显示
         self.checkBox = QtWidgets.QCheckBox(self.centralwidget)
