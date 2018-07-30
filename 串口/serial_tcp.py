@@ -26,7 +26,9 @@ import socket
 
 
 class Ui_MainWindow(QWidget):
+    
     ser = serial.Serial()
+    
     def setupUi(self, MainWindow):
         #串口助手界面
         MainWindow.setObjectName("MainWindow")
@@ -393,6 +395,16 @@ class Ui_MainWindow(QWidget):
         #关闭连接
         self.pushButton_11.setText(_translate("MainWindow", "关闭连接"))  
         #self.pushButton_11.clicked.connect(self.close_server)
+    
+    """
+    def combobox_change(self):
+        if self.comboBox_6.currentIndex() == 0 or self.comboBox_6.currentInd:
+            self.
+    """  
+        
+        
+        
+    
         
         
     #打开串口    
@@ -573,7 +585,7 @@ class Ui_MainWindow(QWidget):
             data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
             client.send_data(data)  #发送客户端信息
             client.close()
-
+    """
       #关闭服务器
     def close_server(self):
         
@@ -583,6 +595,8 @@ class Ui_MainWindow(QWidget):
         client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         #连接服务端
         client.close((address,port))
+        
+    """
         
         
         
