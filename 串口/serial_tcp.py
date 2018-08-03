@@ -22,12 +22,18 @@ import time
 import math
 
 import socket
+import sys
+import stopThreading
+
+from time import sleep
+import multiprocessing
 
 
 
 class Ui_MainWindow(QWidget):
-    
+        
     ser = serial.Serial()
+    sock = socket.socket()
     
     def setupUi(self, MainWindow):
         #串口助手界面
@@ -255,9 +261,20 @@ class Ui_MainWindow(QWidget):
         #关闭连接
         self.pushButton_11 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_11.setGeometry(QtCore.QRect(300, 330, 73, 23))
-        self.pushButton_11.setObjectName("pushButton_6")
+        self.pushButton_11.setObjectName("pushButton_11")
        
+        
+        #开启服务器
+        self.pushButton_12 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_12.setGeometry(QtCore.QRect(190, 370, 73, 23))
+        self.pushButton_12.setObjectName("pushButton_12")
       
+        #发送信息
+        self.pushButton_13 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_13.setGeometry(QtCore.QRect(300, 370, 73, 23))
+        self.pushButton_13.setObjectName("pushButton_13")
+        
+        
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 579, 23))
@@ -395,17 +412,29 @@ class Ui_MainWindow(QWidget):
         #关闭连接
         self.pushButton_11.setText(_translate("MainWindow", "关闭连接"))  
         #self.pushButton_11.clicked.connect(self.close_server)
+        
+        #打开服务器
+        self.pushButton_12.setText(_translate("MainWindow", "开启服务器"))  
+        self.pushButton_12.clicked.connect(self.open_server)
+        
+        #发送信息
+        self.pushButton_13.setText(_translate("MainWindow", "发送信息"))  
+        self.pushButton_13.clicked.connect(self.send_message)
+        
     
-    """
+    
+    #切换不同的模式下界面的变动
     def combobox_change(self):
         if self.comboBox_6.currentIndex() == 0 or self.comboBox_6.currentInd:
-            self.
-    """  
+            self.label_8.hide()
+            self.textEdit.show()
+            self.label_9.setText(self._translate("MainWindow","端口号"))
         
-        
-        
-    
-        
+        if self.comboBox_6.currentIndex() == 1 or self.comboBox_6.currentInd:
+            self.label_8.show()
+            self.label_9.show()
+            self.textEdit.show()
+            self.label_9.setText(self._translate("MainWindow","目标端口号"))
         
     #打开串口    
     def port_open(self):       
@@ -425,6 +454,7 @@ class Ui_MainWindow(QWidget):
         else:
             self.label_12.setText("打开失败")
             
+    
     #关闭串口
     def port_close(self):   
         self.ser.close()
@@ -567,10 +597,10 @@ class Ui_MainWindow(QWidget):
             print(error)
             
     
-    #连接服务器        
+    #Tcp 客户端连接其他服务器端       
     def connect_server(self):
-     
-        self.ser.model = self.comboBox_6.currentText()      
+        self.ser.model = self.comboBox_6.currentText()
+       
         address =('127.0.0.1')  #服务器的IP地址
         port = 8888 #服务器的端口
         client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -578,38 +608,46 @@ class Ui_MainWindow(QWidget):
         client.connect((address,port))
                 
         #while 循环时为了保证能持续进行数据传输
-        while True:
+        while True:            
             data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
             if not data:
                 break
             data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
             client.send_data(data)  #发送客户端信息
             client.close()
-    """
-      #关闭服务器
-    def close_server(self):
+     
+    #TCP打开服务器
+    def open_server(self):
+        self.ser.model = self.comboBox_6.currentText()
         
-        self.ser.model = self.comboBox_6.currentText()      
-        address =('127.0.0.1')  #服务器的IP地址
-        port = 8888 #服务器的端口
-        client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        #连接服务端
-        client.close((address,port))
-        
-    """
-        
-        
-        
+        address = '127.0.0.1' #监听哪些网络 127.0.0.1 是监听本机
+        port = 8888 #监听自己的哪个端口
+        buffsize = 1024 #接收客户端发来的数据缓存区大小
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.bind((address,port))
+        server.listen(2)  #最大连接数
+        while True:
+           
+            data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
+            if not data:
+                break
+            data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
+            server.send_data(data)  #发送客户端信息
+            server.close()
             
+                         
             
-            
-            
-    
-        
-        
-        
-
-            
+    def send_message(self):
+        if(self.checkBox_2.isChecked()):
+                 self.sock.send(binascii.a2b_hex(self.textEdit.toPlainText()))
+        else:
+            self.sock.send(self.textEdit.toPlainText().encode('utf-8'))
+            self.label_12.setText("发送成功")
+    #       self.ser.flushOutput()
+   
+                  
+       
+                    
 #调用程序    
 if __name__ == '__main__':
     
