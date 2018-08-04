@@ -23,7 +23,7 @@ import math
 
 import socket
 import sys
-import stopThreading
+
 
 from time import sleep
 import multiprocessing
@@ -563,7 +563,6 @@ class Ui_MainWindow(QWidget):
         except Exception as error:
             print(error)
             
-
    #实时绘图     
     def on_line(self):
         
@@ -608,15 +607,16 @@ class Ui_MainWindow(QWidget):
         client.connect((address,port))
                 
         #while 循环时为了保证能持续进行数据传输
-        while True:            
+        while True:
+                       
             data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
             if not data:
                 break
             data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
-            client.send_data(data)  #发送客户端信息
+            client.send(data)  #发送客户端信息
             client.close()
      
-    #TCP打开服务器
+    #TCP作为服务器端打开服务器
     def open_server(self):
         self.ser.model = self.comboBox_6.currentText()
         
@@ -624,19 +624,40 @@ class Ui_MainWindow(QWidget):
         port = 8888 #监听自己的哪个端口
         buffsize = 1024 #接收客户端发来的数据缓存区大小
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+       # s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+        
         server.bind((address,port))
         server.listen(2)  #最大连接数
+        """
         while True:
-           
+            
+           # clientSock,address = s.accept()
+            #data = clientSock.recv(2048)
+            
             data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
             if not data:
                 break
             data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
             server.send_data(data)  #发送客户端信息
             server.close()
+            """
+        def tcplink(sock,addr):
+            while True:                
+                recvdata = clientsock.recv(buffsize).decode('utf-8')
+                if recvdata == 'exit' or not recvdata:
+                    break
+                sendata = recvdata +'from sever'
+                clientsock.send(sendata.encode())
+            clientsock.close()
+        while True:
+            clientsock,clientaddress = server.accept()
+            print('connect from:', clientaddress)
             
-                         
-            
+            t = threading.Thread(target = tcplink, args=(clientsock,clientaddress))
+            t.start()
+        server.close()
+        
+       
     def send_message(self):
         if(self.checkBox_2.isChecked()):
                  self.sock.send(binascii.a2b_hex(self.textEdit.toPlainText()))
