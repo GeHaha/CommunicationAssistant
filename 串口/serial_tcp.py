@@ -420,7 +420,7 @@ class Ui_MainWindow(QWidget):
         
         #发送信息
         self.pushButton_13.setText(_translate("MainWindow", "发送信息"))  
-        self.pushButton_13.clicked.connect(self.send_message)
+        #self.pushButton_13.clicked.connect(self.send_message)
         
     
     
@@ -520,8 +520,7 @@ class Ui_MainWindow(QWidget):
                 f = open(filename[0],'r')         
                 with f:
                     data = f.read()
-                    self.textEdit.setText(data)
-                    
+                    self.textEdit.setText(data)                    
     #发送文件    
     def send_file(self):
         if(self.ser.isOpen()):
@@ -546,7 +545,6 @@ class Ui_MainWindow(QWidget):
         plt.grid(True)
         plt.show()
         print('开始仿真')
-
     #读取文件
         path = "H:\PythonPort\串口\XY数据.txt"
         file = open(path,'r')
@@ -595,64 +593,41 @@ class Ui_MainWindow(QWidget):
                 plt.show()      
         except Exception as error:            
             print(error)
-            
-    
+                
     #Tcp 客户端连接其他服务器端       
     def connect_server(self):
         self.ser.model = self.comboBox_6.currentText()
-       
+        BUFSIZE=1024
         address =('127.0.0.1')  #服务器的IP地址
         port = 8888 #服务器的端口
         client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         #连接服务端
-        client.connect((address,port))
-                
-        #while 循环时为了保证能持续进行数据传输
-        while True:
-                       
-            data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
+        client.connect((address,port))            
+        #while 循环时为了保证能持续进行数据传输          
+        while True:         
+            data = input('client send:')
+            if data =='exit':
+                break
+            client.send(data.encode())          #像服务器传输数据  
+            data = client.recv(BUFSIZE).decode('utf-8') #接受服务器端的数据
             if not data:
                 break
-            data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
-            client.send(data)  #发送客户端信息
-            print(1)
-            client.close()
-     
-    #TCP作为服务器端打开服务器
+            print(data)           
+        client.close()
+                                   
+    #作为服务器端
     def open_server(sock,addr):
-    #    self.ser.model = self.comboBox_6.currentText()
-        
         address = '127.0.0.1' #监听哪些网络 127.0.0.1 是监听本机
         port = 8888 #监听自己的哪个端口
         buffsize = 1024 #接收客户端发来的数据缓存区大小
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-       # s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)  #允许重用本地地址和端口
-       
+       # s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)  #允许重用本地地址和端口       
         server.bind((address,port))
         server.listen(2)  #最大连接数 
-        """
-        def tcplink(sock,addr):                 
-            while True:
-               recvdata = clientsock.recv(buffsize).decode('utf-8')
-               if recvdata == 'exit' or not recvdata:                     
-                   break
-               sendata = recvdata +'from sever'
-               clientsock.send(sendata.encode())
-               
-               print(1)
-               clientsock.close()
-                        
-        while True:
-            clientsock,clientaddress = server.accept()        
-            print('connect from:', clientaddress)
-            t=threading.Thread(target=tcplink,args=(clientsock,clientaddress))  #t为新创建的线程
-            t.start()
-        server.close()
-      """  
         #设置退出条件
         stop_connect = False      
         while not stop_connect:          
-                print("waiting for connection....")
+                print("正在连接客户端....")
                 clientsock,clientaddress = server.accept()
                 print('connect from:', clientaddress) 
                 while True:             
@@ -671,19 +646,7 @@ class Ui_MainWindow(QWidget):
                         break
                 clientsock.close()
                 server.close()    
-                
-                
-    def send_message(self):
-        if(self.checkBox_2.isChecked()):
-                 self.sock.send(binascii.a2b_hex(self.textEdit.toPlainText()))
-        else:
-            self.sock.send(self.textEdit.toPlainText().encode('utf-8'))
-            self.label_12.setText("发送成功")
-    #       self.ser.flushOutput()
-   
-                  
-       
-                    
+                                
 #调用程序    
 if __name__ == '__main__':
     
@@ -694,20 +657,5 @@ if __name__ == '__main__':
     MainWindow.show() 
     sys.exit(app.exec_()) 
 
-"""
-while True:
-            
-           # clientSock,address = s.accept()
-            #data = clientSock.recv(2048)
-            
-            data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
-            if not data:
-                break
-            data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
-            server.send_data(data)  #发送客户端信息
-            server.close()
-"""
-
-    
 
                                                                                                                                         
