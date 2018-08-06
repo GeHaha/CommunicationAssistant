@@ -18,7 +18,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import animation
 from matplotlib.patches import Circle
-import time
+from time import ctime
+
 import math
 
 import socket
@@ -614,50 +615,64 @@ class Ui_MainWindow(QWidget):
                 break
             data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
             client.send(data)  #发送客户端信息
+            print(1)
             client.close()
      
     #TCP作为服务器端打开服务器
-    def open_server(self):
-        self.ser.model = self.comboBox_6.currentText()
+    def open_server(sock,addr):
+    #    self.ser.model = self.comboBox_6.currentText()
         
         address = '127.0.0.1' #监听哪些网络 127.0.0.1 是监听本机
         port = 8888 #监听自己的哪个端口
         buffsize = 1024 #接收客户端发来的数据缓存区大小
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-       # s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
-        
+       # s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)  #允许重用本地地址和端口
+       
         server.bind((address,port))
-        server.listen(2)  #最大连接数
+        server.listen(2)  #最大连接数 
         """
+        def tcplink(sock,addr):                 
+            while True:
+               recvdata = clientsock.recv(buffsize).decode('utf-8')
+               if recvdata == 'exit' or not recvdata:                     
+                   break
+               sendata = recvdata +'from sever'
+               clientsock.send(sendata.encode())
+               
+               print(1)
+               clientsock.close()
+                        
         while True:
-            
-           # clientSock,address = s.accept()
-            #data = clientSock.recv(2048)
-            
-            data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
-            if not data:
-                break
-            data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
-            server.send_data(data)  #发送客户端信息
-            server.close()
-            """
-        def tcplink(sock,addr):
-            while True:                
-                recvdata = clientsock.recv(buffsize).decode('utf-8')
-                if recvdata == 'exit' or not recvdata:
-                    break
-                sendata = recvdata +'from sever'
-                clientsock.send(sendata.encode())
-            clientsock.close()
-        while True:
-            clientsock,clientaddress = server.accept()
+            clientsock,clientaddress = server.accept()        
             print('connect from:', clientaddress)
-            
-            t = threading.Thread(target = tcplink, args=(clientsock,clientaddress))
+            t=threading.Thread(target=tcplink,args=(clientsock,clientaddress))  #t为新创建的线程
             t.start()
         server.close()
-        
-       
+      """  
+        #设置退出条件
+        stop_connect = False      
+        while not stop_connect:          
+                print("waiting for connection....")
+                clientsock,clientaddress = server.accept()
+                print('connect from:', clientaddress) 
+                while True:             
+                    try:    
+                        recvdata = clientsock.recv(buffsize).decode('utf-8')
+                    except:
+                        print("....")
+                        clientsock.close()
+                        break
+                    if not recvdata:
+                        break
+                    sendata ='from server:'+recvdata 
+                    clientsock.send(sendata.encode('utf-8'))
+                    stop_connect = '0'
+                    if stop_connect:
+                        break
+                clientsock.close()
+                server.close()    
+                
+                
     def send_message(self):
         if(self.checkBox_2.isChecked()):
                  self.sock.send(binascii.a2b_hex(self.textEdit.toPlainText()))
@@ -679,8 +694,19 @@ if __name__ == '__main__':
     MainWindow.show() 
     sys.exit(app.exec_()) 
 
-
-
+"""
+while True:
+            
+           # clientSock,address = s.accept()
+            #data = clientSock.recv(2048)
+            
+            data = self.ser.write(binascii.a2b_hex(self.textEdit.toPlainText()))
+            if not data:
+                break
+            data = self.ser.write(self.textEdit.toPlainText().encode('utf-8'))
+            server.send_data(data)  #发送客户端信息
+            server.close()
+"""
 
     
 
